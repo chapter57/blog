@@ -2,8 +2,9 @@
 layout: default
 ---
 <script>
-  // Copies of the writing app installed before it moved to /write/ open here. Send them on.
-  if (matchMedia("(display-mode: standalone)").matches || navigator.standalone) location.replace("write/");
+  // Copies of the writing app installed before it moved to /write/ open here. Send them on,
+  // unless someone followed a link here on purpose.
+  if ((matchMedia("(display-mode: standalone)").matches || navigator.standalone) && !document.referrer) location.replace("write/");
 </script>
 {%- assign issue = site.data.issues | last -%}
 {%- assign book = site.data.books | where: "status", "current" | first -%}

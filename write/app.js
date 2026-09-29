@@ -445,6 +445,19 @@
   $("spellBtn").onclick = () => toggle("spell");
   $("sizeDown").onclick = () => { prefs.size--; applyPrefs(); };
   $("sizeUp").onclick = () => { prefs.size++; applyPrefs(); };
+  // Links to the home page. Pieces are saved first. In the installed app, the
+  // home page opens in the browser so the writing window stays open.
+  const installed = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  ["homeLink", "homeLink2"].forEach((id) => {
+    const a = $(id);
+    if (installed) { a.target = "_blank"; a.rel = "noopener"; a.addEventListener("click", () => saveNow()); return; }
+    a.addEventListener("click", async (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) { saveNow(); return; }
+      e.preventDefault();
+      await saveNow();
+      location.href = a.href;
+    });
+  });
   $("exportBtn").title = `Save a copy as Word, PDF, Markdown or plain text (${key("S", true)})`;
 
   // ---------- export ----------
