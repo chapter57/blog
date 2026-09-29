@@ -1,0 +1,79 @@
+# Pages CMS settings: the editing screens at https://app.pagescms.org.
+# Each entry under "content" becomes a section in the sidebar there.
+
+media:
+  input: assets/images
+  output: /assets/images
+
+content:
+  - name: almanac
+    label: Almanac
+    description: Prompts, notes and open calls. The newest post appears first on the site.
+    type: collection
+    path: _posts
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, kind, date]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: date
+        label: Date
+        description: The post is listed under this date, newest first.
+        type: date
+        required: true
+      - name: kind
+        label: Kind of post
+        description: A Prompt is featured on the front page, with a "Write it in Longhand" button.
+        type: select
+        default: Note
+        options:
+          values: [Prompt, Note, Open calls, News]
+      - name: summary
+        label: Summary
+        description: One or two sentences shown in lists and on the front page. Leave empty to use the start of the post.
+        type: text
+      - name: body
+        label: Post
+        type: rich-text
+
+  - name: essays
+    label: Essays
+    description: Longer essays on craft. Each one gets its own page and is listed on the front page.
+    type: collection
+    path: _essays
+    filename: "{primary}.md"
+    view:
+      fields: [title, published_on]
+      primary: title
+      sort: [published_on, title]
+      default:
+        sort: published_on
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: dek
+        label: Description
+        description: One sentence that tells readers what the essay is about.
+        type: text
+      - name: author
+        label: Author
+        type: string
+        default: Longhand
+      - name: published_on
+        label: Date
+        type: date
+        required: true
+      - name: body
+        label: Essay
+        type: rich-text

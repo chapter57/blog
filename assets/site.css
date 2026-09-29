@@ -80,7 +80,7 @@ h1, h2, h3 { text-wrap: balance; }
 .wrap { max-width: 72rem; margin-inline: auto; padding-inline: var(--gutter); }
 
 /* ---------- small type ---------- */
-.kicker, .label, .meta, .fine, .nav, .button, .fac-bar, .fac-status, .signup label, .call-what, .call-when, .byline {
+.kicker, .label, .meta, .fine, .nav, .button, .fac-bar, .fac-status, .signup label, .byline {
   font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em;
 }
 .kicker { text-transform: uppercase; color: var(--ink-soft); margin: 0 0 1rem; }
@@ -200,18 +200,56 @@ h1, h2, h3 { text-wrap: balance; }
 .almanac-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
 .prompt-title { font-size: clamp(1.6rem, 3vw, 2.1rem); line-height: 1.15; font-style: italic; margin: 0 0 0.8rem; letter-spacing: -0.01em; }
 .prompt p:not(.prompt-title) { max-width: var(--measure); }
-.call-list { list-style: none; margin: 0 0 1rem; padding: 0; }
-.call-list li { display: flex; flex-direction: column; gap: 0.15rem; padding-block: 0.7rem; border-bottom: 1px solid var(--rule); }
-.call-name { font-size: 1.1rem; }
-.call-what { color: var(--ink-soft); letter-spacing: 0.02em; }
-.call-when { color: var(--accent); }
-.calls .soon { padding-block: 0.25rem 0.75rem; }
-.note { margin-top: clamp(2rem, 5vw, 3rem); max-width: 44rem; }
-.note-body { font-size: 1.1rem; line-height: 1.75; }
-.note-body p { margin: 0 0 1em; max-width: var(--measure); }
-.note-body p:last-child::after { content: " \2014 Longhand"; font-style: italic; color: var(--ink-soft); white-space: nowrap; }
-.past { margin-top: clamp(2rem, 5vw, 3rem); max-width: 44rem; }
-.almanac-page { padding-block: clamp(2.5rem, 6vw, 4rem); }
+.prompt-title a { color: inherit; text-decoration: none; }
+.prompt-title a:hover { color: var(--accent); }
+
+/* Almanac posts in a list */
+.post-list { list-style: none; margin: 0; padding: 0; }
+.post-item a { display: flex; flex-direction: column; gap: 0.3rem; padding-block: 0.9rem; border-bottom: 1px solid var(--rule); text-decoration: none; color: var(--ink); }
+.post-item:first-child a { padding-top: 0.2rem; }
+.post-item-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em; color: var(--ink-soft); }
+.post-item-title { font-size: 1.2rem; line-height: 1.3; letter-spacing: -0.005em; }
+.post-item a:hover .post-item-title { color: var(--accent); }
+.post-item-summary { color: var(--ink-soft); font-size: 0.98rem; }
+.latest .actions { margin-top: 1rem; }
+
+/* The kind of post: Prompt, Note, Open calls, News */
+.kind { display: inline-block; text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--mono); font-size: 0.66rem; font-weight: 500; padding: 0.15rem 0.45rem; border-radius: 2px; border: 1px solid var(--rule); color: var(--ink-soft); }
+.kind-prompt { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+.kind-open-calls { border-color: var(--ink-soft); color: var(--ink); }
+
+.text-link { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* The Almanac page */
+.lead-almanac .moons-wrap { margin-top: 1.5rem; }
+.lead-art-small { max-width: 11rem; }
+.lead-art-small .ill-postmark { width: 100%; }
+.almanac-archive { display: flex; flex-direction: column; gap: clamp(2rem, 5vw, 3rem); padding-bottom: clamp(3rem, 7vw, 5rem); }
+.archive-month { max-width: 48rem; }
+.archive-month .label { margin-bottom: 0.5rem; }
+
+/* A single Almanac post */
+.post { max-width: calc(var(--measure) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); padding-block: clamp(2.5rem, 7vw, 5rem) 3rem; }
+.post-head h1 { font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; margin: 0; letter-spacing: -0.015em; }
+.post-head .dek { margin-top: 1rem; }
+.post .ill-rule { margin-block: 1.75rem 2rem; }
+.post-body { font-size: 1.125rem; line-height: 1.75; }
+.post-body p { margin: 0 0 1.1em; }
+.post-body h2 { font-size: 1.3rem; font-weight: 600; margin: 2.2rem 0 0.6rem; }
+.post-body ul, .post-body ol { padding-left: 1.3rem; }
+.post-body li { margin-bottom: 0.4rem; }
+.post-body img { display: block; margin: 1.5rem 0; border-radius: 3px; }
+.post-body blockquote { margin: 1.5rem 0; padding-left: 1.2rem; border-left: 2px solid var(--accent); color: var(--ink-soft); font-style: italic; }
+.prompt-box { margin-top: 2.5rem; padding: 1.25rem 1.4rem; background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 4px; }
+.prompt-box p { margin: 0 0 0.75rem; }
+.prompt-box .actions { margin: 1rem 0 0; }
+.prompt-box-title { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+.post-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.post-nav a { display: flex; flex-direction: column; gap: 0.2rem; text-decoration: none; color: var(--ink); }
+.post-nav a:hover .post-nav-title { color: var(--accent); }
+.post-nav-next { grid-column: 2; text-align: right; }
+.post-nav-title { font-size: 1.05rem; }
+.post-all { margin-top: 1.5rem; }
 
 /* ---------- tables of contents ---------- */
 .toc { list-style: none; margin: 0; padding: 0; }

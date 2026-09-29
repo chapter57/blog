@@ -6,15 +6,15 @@ layout: default
   // unless someone followed a link here on purpose.
   if ((matchMedia("(display-mode: standalone)").matches || navigator.standalone) && !document.referrer) location.replace("write/");
 </script>
-{%- assign issues = site.almanac | sort: "month" | reverse -%}
-{%- assign latest = issues | first -%}
+{%- assign latest = site.posts | first -%}
+{%- assign prompt = site.posts | where: "kind", "Prompt" | first -%}
 {%- assign essays = site.essays | sort: "published_on" | reverse -%}
 
 <section class="lead wrap">
   <div class="lead-copy">
-    <p class="kicker">{{ site.season }}{% if latest %} · Almanac No. {{ latest.number }} is out{% endif %}</p>
+    <p class="kicker">{{ site.season }}{% if prompt %} · This month's prompt is up{% endif %}</p>
     <h1>A quiet place to write, and a little company while you do.</h1>
-    <p class="dek">Longhand is a free writing app, a monthly almanac for writers, and an occasional essay on craft. It's for people who care how a sentence sounds.</p>
+    <p class="dek">Longhand is a free writing app, an almanac for writers, and an occasional essay on craft. It's for people who care how a sentence sounds.</p>
   </div>
   <div class="lead-art">{% include ill-pen.html %}</div>
 </section>
@@ -46,23 +46,46 @@ layout: default
 <div class="wrap">{% include ill-rule.html %}</div>
 
 <section class="dept wrap almanac" id="almanac" aria-labelledby="almanac-h">
-  <h2 class="label" id="almanac-h"><span>The Almanac</span><span class="label-note">once a month</span></h2>
+  <h2 class="label" id="almanac-h"><span>The Almanac</span><span class="label-note">prompts, notes and open calls</span></h2>
   {%- if latest %}
-  <p class="section-intro">Each month: a prompt to write toward, places currently reading submissions, and a short note on the work of writing.</p>
-  {%- assign latest_note = latest.content | markdownify %}
-  {% include almanac-issue.html issue=latest note=latest_note %}
-  {%- if issues.size > 1 %}
-  <div class="past">
-    <h3 class="label"><span>Past issues</span></h3>
-    <ul class="toc">
-      {%- for i in issues offset: 1 %}
-      <li><a href="{{ i.url | relative_url }}"><span class="toc-title">{{ i.month | date: "%B %Y" }}</span><span class="toc-author">{{ i.prompt_title }}</span></a></li>
-      {%- endfor %}
-    </ul>
+  <div class="almanac-head">
+    {% include ill-postmark.html month=latest.date %}
+    <div>
+      <p class="section-intro">Prompts to write toward, short notes on the work of writing, and places currently reading submissions. Posted as they come, a few times a month.</p>
+      <div class="moons-wrap">{% include ill-moons.html %}</div>
+    </div>
   </div>
-  {%- endif %}
+
+  <div class="almanac-grid">
+    {%- if prompt %}
+    <section class="prompt" aria-labelledby="prompt-h">
+      <h3 class="label"><span>This month's prompt</span></h3>
+      <p class="prompt-title" id="prompt-h"><a href="{{ prompt.url | relative_url }}">{{ prompt.title }}</a></p>
+      <p>{{ prompt.summary | default: prompt.excerpt | strip_html | strip_newlines | truncatewords: 45 }}</p>
+      <p class="actions">
+        <a class="button" href="{{ '/write/' | relative_url }}">Write it in Longhand</a>
+        <a class="text-link" href="{{ prompt.url | relative_url }}">Read the prompt</a>
+      </p>
+    </section>
+    {%- endif %}
+
+    <section class="latest" aria-labelledby="latest-h">
+      <h3 class="label" id="latest-h"><span>Latest posts</span></h3>
+      <ul class="post-list">
+        {%- assign shown = 0 %}
+        {%- for p in site.posts %}
+        {%- if prompt and p.url == prompt.url %}{% continue %}{% endif %}
+        {%- if shown == 4 %}{% break %}{% endif %}
+        {% include post-item.html post=p %}
+        {%- assign shown = shown | plus: 1 %}
+        {%- endfor %}
+      </ul>
+      {%- if shown == 0 %}<p class="soon">More posts are on their way: notes on craft, and places to send your work.</p>{% endif %}
+      <p class="actions"><a class="text-link" href="{{ '/almanac/' | relative_url }}">Everything in the Almanac</a></p>
+    </section>
+  </div>
   {%- else %}
-  <p class="soon">The first Almanac arrives soon.</p>
+  <p class="soon">The first Almanac post arrives soon.</p>
   {%- endif %}
 </section>
 
