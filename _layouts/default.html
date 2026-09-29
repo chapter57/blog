@@ -15,7 +15,7 @@
 <meta name="theme-color" content="#F2F3EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141619" media="(prefers-color-scheme: dark)">
 <link rel="preload" href="{{ '/fonts/Literata-normal-400.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 <link rel="alternate" type="application/atom+xml" title="The Longhand Almanac" href="{{ '/almanac/feed.xml' | relative_url }}">
 </head>
 <body>
