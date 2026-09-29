@@ -1,51 +1,45 @@
 # Longhand
 
-A quiet place to write, read, and talk about both: a free writing app, a small literary journal, and a book club.
+A quiet place to write, and a little company while you do: a free writing app, a monthly almanac for writers, and an occasional essay on craft.
 
-The site is built by GitHub Pages from this project. Changes go live a minute or two after they reach the `gh-pages` branch.
+The site is built by GitHub Pages from this project. Changes go live a minute or two after they reach the `gh-pages` branch. Readers write to longhandlit@gmail.com (set as `email` in `_config.yml`).
 
 ## What's where
 
-- `index.html`: the front page
-- `journal/`: the journal page and the submission guidelines (`journal/submit.md`)
-- `book-club/`: the book club page
-- `_journal/`: one file per published journal piece
-- `_data/issues.yml`: the journal's issues, with deadlines and notes
-- `_data/books.yml`: the book club's books, reading schedules and questions
-- `_config.yml`: site settings, including the email, newsletter and discussion links
-- `_layouts/`, `_includes/`, `assets/site.css`: the page design
+- `index.html`: the front page, with the app, the current Almanac, the essays and "Write to us"
+- `_almanac/`: one file per Almanac issue, named by month (`2026-10.md`)
+- `_essays/`: one file per craft essay; `how-to-add-an-essay.md` is a template
+- `_layouts/`, `_includes/`, `assets/site.css`: the page design; the drawings (pen, moon phases, postmark, envelope, ink rule) are in `_includes/ill-*.html`
+- `_config.yml`: site settings
 - `fonts/`: Literata and IBM Plex Mono, both under the SIL Open Font License (see `fonts/OFL.txt`)
 - `write/`: the Longhand writing app
 - `sw.js`: retires the offline copy that older installs of the app kept at the site's main address
 
-## Switching on email, the newsletter and the discussion space
+## A new Almanac issue
 
-In `_config.yml`, fill in:
+1. Copy last month's file in `_almanac/` and name the copy by the new month, like `2026-11.md`.
+2. Change `number`, `month`, the prompt lines, and the open calls. Each open call has a `name`, `what`, `deadline` and `url`; leave `open_calls: []` for a month without any.
+3. Replace the note under the second `---` line with this month's note from the editor.
 
-- `email`: where submissions and questions go
-- `newsletter_username`: your username at [Buttondown](https://buttondown.com), a free newsletter service
-- `discussion_url`: the invite link to your discussion space, such as a Discord server
+The front page always shows the newest issue in full and lists the older ones. Each issue also has its own page at `longhandlit.com/almanac/2026-11/`.
 
-Until one is filled in, the site says that part is coming soon.
+## A new essay
 
-## Adding a journal piece
+1. Copy `_essays/how-to-add-an-essay.md` to a new file with a short name, like `_essays/on-revision.md`.
+2. Fill in the title, one-sentence description (`dek`), author and date, and paste the essay underneath.
+3. Delete the `published: false` line.
 
-1. Copy `_journal/how-to-add-a-piece.md` to a new file with a short name, like `_journal/the-orchard.md`.
-2. Fill in the title, author, issue number, form (poem, fiction or essay) and bio.
-3. Paste the piece below the second `---` line. For a poem, keep each line on its own line and leave an empty line between stanzas.
-4. Delete the `published: false` line.
+It appears in the Essays section of the front page, newest first, with its own page at `longhandlit.com/essays/on-revision/`.
 
-When an issue is ready, change its `status` in `_data/issues.yml` from `reading` to `published` and add its `published_on` date. To open the next issue, add a new entry at the end of that file.
+## The Almanac by email
 
-## Changing the book club's book
-
-In `_data/books.yml`, change the finished book's `status` to `past`, and add the new book with `status: current`, a short blurb, and a weekly schedule. Each week's row is highlighted on the site automatically while that week is on.
+When you set up an email edition at [Buttondown](https://buttondown.com), put your username in `newsletter_username` in `_config.yml`, and a sign-up box replaces the "write to us to be added" note on the front page.
 
 ## The domain
 
 The site lives at [longhandlit.com](https://longhandlit.com), registered at Namecheap. The `CNAME` file tells GitHub Pages to serve it there, and `url` in `_config.yml` matches.
 
-DNS records for the website (the forum at `forum.longhandlit.com` is on Namecheap hosting and has its own record):
+DNS records for the website:
 
 | Type | Host | Value |
 |---|---|---|

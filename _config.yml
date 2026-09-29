@@ -2,18 +2,17 @@
 # GitHub rebuilds the site a minute or two after this file changes.
 
 title: Longhand
-tagline: A quiet place to write, read, and talk about both.
 description: >-
-  Longhand is a free writing app, a small literary journal, and a book club
-  for people who care how a sentence sounds.
+  Longhand is a free writing app, a monthly almanac for writers, and an
+  occasional essay on craft.
 season: Autumn 2026
 
-# Fill these in to switch on the matching parts of the site.
-# Leave one as "" and the site says that part is coming soon.
-email: ""                 # where journal submissions and questions go, e.g. "editors@longhand.example"
-newsletter_username: ""   # your Buttondown username (buttondown.com), e.g. "longhand"
-discussion_url: ""        # the forum's address, "https://forum.longhandlit.com", once it's installed
-discussion_name: the Longhand forum  # shown as "Join us on the Longhand forum"
+# Where readers write to us: letters, answers to the prompt, open calls.
+email: longhandlit@gmail.com
+
+# Once the Almanac has an email edition, put your Buttondown username here
+# (buttondown.com) and a sign-up box appears on the front page.
+newsletter_username: ""
 
 # The site's address. The CNAME file next to this one tells GitHub Pages
 # to serve the site at this domain.
@@ -21,16 +20,25 @@ url: "https://longhandlit.com"
 baseurl: ""
 
 collections:
-  journal:
+  almanac:
     output: true
-    permalink: /journal/:name/
+    permalink: /almanac/:name/
+  essays:
+    output: true
+    permalink: /essays/:name/
 
 defaults:
   - scope:
       path: ""
-      type: journal
+      type: almanac
     values:
-      layout: piece
+      layout: almanac
+  - scope:
+      path: ""
+      type: essays
+    values:
+      layout: essay
+      author: Longhand
 
 markdown: kramdown
 kramdown:
