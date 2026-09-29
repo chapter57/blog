@@ -92,7 +92,11 @@
     display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px;
     padding-inline: 16px; padding-block: 10px;
   }
-  .mark { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink); letter-spacing: .01em; }
+  .mark { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink); letter-spacing: .01em; text-decoration: none; border-radius: 2px; }
+  .mark:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .drawer-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+  .home-link { color: var(--accent); text-underline-offset: 3px; }
   .piece-title {
     flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     color: var(--ink-faint);
@@ -167,7 +171,7 @@
   .piece-open .m { font-size: 11px; color: var(--ink-soft); font-variant-numeric: tabular-nums; line-height: 1.5; }
   .piece-del { font-size: 11px; color: var(--ink-faint); }
   .piece-del:hover { color: var(--warn); }
-  .drawer-note { margin: auto 0 0; color: var(--ink-soft); line-height: 1.6; font-size: 11.5px; }
+  .drawer-note { margin: 0; color: var(--ink-soft); line-height: 1.6; font-size: 11.5px; }
   .drawer-note kbd { font-family: var(--mono); font-size: 11px; }
 
   #toast {
@@ -208,7 +212,7 @@
 <body>
 
 <header class="bar top" id="topbar">
-  <span class="mark">Longhand</span>
+  <a class="mark" id="homeLink" href="../" title="Go to the Longhand home page">Longhand</a>
   <button id="drawerBtn" aria-expanded="false" aria-controls="drawer">Pieces</button>
   <span class="piece-title" id="pieceTitle"></span>
   <div class="tools">
@@ -239,7 +243,10 @@
     </div>
   </div>
   <ul id="pieceList"></ul>
-  <p class="drawer-note">Your pieces are saved in this browser, on this computer, and nowhere else. Use Export to keep a copy of anything that matters.</p>
+  <div class="drawer-foot">
+    <p class="drawer-note">Your pieces are saved in this browser, on this computer, and nowhere else. Use Export to keep a copy of anything that matters.</p>
+    <p class="drawer-note"><a class="home-link" id="homeLink2" href="../">Visit the Longhand home page</a></p>
+  </div>
 </aside>
 
 <main>
