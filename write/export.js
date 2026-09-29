@@ -1,5 +1,5 @@
 // Longhand's export formats: Word (.docx), Markdown and plain text.
-// Takes the same document shape as rtf.js: a list of blocks
+// Takes the editor's document as a list of blocks
 // { tag: "p" | "h2", runs: [{ text, b, i } | { br: true }] }.
 (function (root) {
   "use strict";

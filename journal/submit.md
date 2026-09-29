@@ -35,7 +35,7 @@ Please send only work that hasn't been published before, in print or online, inc
 Email your work to {% if site.email != "" %}[{{ site.email }}](mailto:{{ site.email }}){% else %}the submissions address, which will be posted here soon{% endif %}.
 
 - Put the form and title in the subject line, like *Poetry: The Orchard* or *Fiction: Late Trains*.
-- Attach your work as a Rich Text (.rtf), Word (.docx) or PDF file. A file saved from [Longhand]({{ '/write/' | relative_url }}) is perfect.
+- Attach your work as a Word (.docx) or PDF file. [Longhand]({{ '/write/' | relative_url }})'s Export makes both.
 - In the email, include two or three sentences about yourself, written in the third person. We'll print it with your work.
 
 Sending the same piece to other journals at the same time is fine. If it's accepted somewhere else, just let us know.

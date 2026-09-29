@@ -4,13 +4,10 @@
   const editor = $("editor");
   const SIZES = [16, 17.5, 19, 21, 23.5];
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const canUseFiles = "showSaveFilePicker" in window && "showOpenFilePicker" in window;
-  const RTF_TYPES = [{ description: "Rich Text Document", accept: { "text/rtf": [".rtf"] } }];
-  const OPEN_TYPES = [{ description: "Writing", accept: { "text/rtf": [".rtf"], "text/plain": [".txt", ".text", ".md"] } }];
+  const canUseFiles = "showSaveFilePicker" in window;
   // Shortcut labels: ⌘ on a Mac, Ctrl everywhere else. The shortcuts themselves accept either key.
   const isMac = /Mac|iPhone|iPad/.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent);
   const key = (k, shift) => (isMac ? (shift ? "\u21e7\u2318" : "\u2318") + k : "Ctrl+" + (shift ? "Shift+" : "") + k);
-  const APPS = isMac ? "Word, Pages, TextEdit or Scrivener" : "Word, LibreOffice or Scrivener";
 
   // ---------- small stores ----------
   // Settings live in localStorage; the writing itself lives in IndexedDB.
@@ -91,7 +88,7 @@
   const toHTML = (blocks) => blocks.map((b) => `<${b.tag}>${b.html || "<br>"}</${b.tag}>`).join("");
   function parse(html) { const t = document.createElement("template"); t.innerHTML = html || ""; return t.content; }
 
-  // Between the editor's HTML and the RTF module's runs.
+  // Between the editor's HTML and the export module's runs.
   function runsOf(root) {
     const runs = [];
     (function walk(node, b, i) {
@@ -111,18 +108,6 @@
     return runs;
   }
   const htmlToDoc = (html) => blocksOf(parse(html)).map((b) => ({ tag: b.tag, runs: runsOf(parse(b.html)) }));
-  function docToHTML(blocks) {
-    return blocks.map((b) => {
-      const inner = b.runs.map((r) => {
-        if (r.br) return "<br>";
-        let s = esc(r.text.replace(/\t/g, " "));
-        if (r.b && b.tag === "p") s = `<strong>${s}</strong>`;
-        if (r.i) s = `<em>${s}</em>`;
-        return s;
-      }).join("");
-      return `<${b.tag}>${inner.trim() ? inner : "<br>"}</${b.tag}>`;
-    }).join("");
-  }
 
   // ---------- small helpers ----------
   const fmt = (n) => n.toLocaleString();
@@ -130,7 +115,6 @@
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const wordsIn = (text) => (text.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).length;
   const blockTexts = (root) => [...root.children].map((c) => c.textContent);
-  const stripExt = (name) => name.replace(/\.(rtf|txt|text|md)$/i, "");
   function todayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
   function ago(t) {
     const s = (Date.now() - t) / 1000;
@@ -144,16 +128,15 @@
     const t = [...parse(html).children].map((c) => c.textContent.trim()).find(Boolean);
     return t ? (t.length > 60 ? t.slice(0, 58).trim() + "…" : t) : "";
   }
-  const titleOf = (p) => (p.fileName ? stripExt(p.fileName) : firstLine(p.html)) || "Untitled";
-  const fileNameFor = (p) => (firstLine(p.html).replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60) || "Untitled") + ".rtf";
+  const titleOf = (p) => firstLine(p.html) || "Untitled";
 
   // ---------- state ----------
   const STARTER = [
     ["h2", "Start here"],
-    ["p", "This is Longhand, a quiet place to write. It works without the internet, and it saves your writing as real files on your computer."],
-    ["p", `Press ${key("S")} to save a piece as a Rich Text file. After that, Longhand keeps the file up to date as you write, and you can open it in ${APPS} whenever you like. Press ${key("O")} to open an .rtf file, and ${key("S", true)} to save a copy under a new name.`],
-    ["p", "Need another format? <em>Export</em> saves a copy as a Word document for submitting your work, a PDF, Markdown for Substack and blogs, or plain text."],
-    ["p", "Even before you save a file, nothing is lost. Longhand keeps a copy of every piece on this computer. You’ll find them all under <em>Pieces</em>."],
+    ["p", "This is Longhand, a quiet place to write. Click at the end of this page and begin, or open <em>Pieces</em> and start a fresh one."],
+    ["p", "Your writing stays with you. Longhand saves every piece as you type, in this browser on this computer. Nothing is sent to us or to anyone else. There’s no account, and we never see a word you write."],
+    ["p", "That also means your pieces live only here. They won’t appear on another computer, and clearing this browser’s history and site data erases them. When a piece matters, use <em>Export</em> to keep a copy: a Word document for submitting your work, a PDF, Markdown for Substack and blogs, or plain text."],
+    ["p", "If you like, install Longhand on your computer. It gets its own window and icon, and it works without the internet. In Chrome, click the install icon at the right end of the address bar. In Microsoft Edge, open the ⋯ menu and choose <em>Apps</em>, then <em>Install this site as an app</em>."],
     ["p", "Quotes curl themselves as you type: “Like this,” she said. Two hyphens become a dash — like that. Three dots become an ellipsis…"],
     ["p", `Type # and a space at the start of a line to make a heading. Press ${key("I")} for <em>italics</em> and ${key("B")} for <strong>bold</strong>.`],
     ["p", "<em>Focus</em> dims everything except the paragraph you are in. <em>Typewriter</em> keeps the line you are writing in the middle of the screen, so your eyes can stay put."],
@@ -181,16 +164,14 @@
 
   async function keep(p) {
     try { await db.put(p); backupBroken = false; }
-    catch (e) {
-      // If the file link can't be stored, keep the words anyway.
-      try { const copy = Object.assign({}, p); delete copy.handle; await db.put(copy); backupBroken = false; }
-      catch (e2) { backupBroken = true; }
-    }
+    catch (e) { backupBroken = true; }
     showStatus();
   }
 
-  // ---------- saving: the in-app copy, then the file ----------
-  let saveTimer = 0, fileTimer = 0, writing = Promise.resolve();
+  // ---------- saving ----------
+  // Every piece is saved as you type, in this browser's storage on this computer.
+  // Nothing is ever sent anywhere. Export is the only way writing leaves Longhand.
+  let saveTimer = 0;
 
   function scheduleSave() {
     clearTimeout(saveTimer);
@@ -201,181 +182,22 @@
     const p = piece();
     if (!p) return;
     const html = toHTML(blocksOf(editor));
-    if (html !== p.html) { p.html = html; p.updated = Date.now(); p.dirty = true; }
+    if (html !== p.html) { p.html = html; p.updated = Date.now(); }
     p.words = countWords();
     await keep(p);
-    if (p.dirty && p.handle) { clearTimeout(fileTimer); fileTimer = setTimeout(() => writeFile(p, false), 1500); }
-    showStatus();
-  }
-
-  // Writes the piece to its file. `asked` is true when the writer pressed Save,
-  // which is the only time the browser lets us ask for permission.
-  function writeFile(p, asked) {
-    writing = writing.then(async () => {
-      if (!p || !p.handle) return false;
-      try {
-        let perm = await p.handle.queryPermission({ mode: "readwrite" });
-        if (perm !== "granted" && asked) perm = await p.handle.requestPermission({ mode: "readwrite" });
-        if (perm !== "granted") { p.needsPermission = true; showStatus(); return false; }
-        p.needsPermission = false;
-        const html = p.html;
-        const w = await p.handle.createWritable();
-        await w.write(RTF.toRTF(htmlToDoc(html)));
-        await w.close();
-        p.fileSavedAt = (await p.handle.getFile()).lastModified;
-        p.fileError = null;
-        if (p.html === html) p.dirty = false;
-        await keep(p);
-        showStatus();
-        return true;
-      } catch (e) {
-        p.fileError = e && e.name === "NotFoundError"
-          ? `${p.fileName} was moved or deleted. Use Save as to choose where to keep it.`
-          : `Couldn’t save to ${p.fileName}. Your words are still kept in Longhand.`;
-        showStatus();
-        return false;
-      }
-    });
-    return writing;
-  }
-
-  async function save() {
-    await saveNow();
-    const p = piece();
-    if (!p.handle) return saveAs();
-    clearTimeout(fileTimer);
-    if (await writeFile(p, true)) toast(`Saved to ${p.fileName}.`);
-  }
-
-  async function saveAs() {
-    await saveNow();
-    const p = piece();
-    if (!canUseFiles) return downloadCopy(p);
-    let handle;
-    try {
-      handle = await window.showSaveFilePicker({ suggestedName: p.fileName || fileNameFor(p), types: RTF_TYPES, id: "longhand" });
-    } catch (e) {
-      if (e && e.name !== "AbortError") toast("Longhand couldn’t open the save window.");
-      return;
-    }
-    p.handle = handle;
-    p.fileName = handle.name;
-    p.dirty = true;
-    await keep(p);
-    if (await writeFile(p, true)) { toast(`Saved to ${p.fileName}. Longhand will keep it up to date as you write.`); updateStats(); }
-  }
-
-  function downloadCopy(p) {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([RTF.toRTF(htmlToDoc(p.html))], { type: "text/rtf" }));
-    a.download = fileNameFor(p);
-    document.body.append(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    toast("Saved a copy to your Downloads folder.");
   }
 
   function showStatus() {
-    const p = piece();
     const s = $("saveState");
-    if (!p) return;
-    let msg, warn = false;
-    if (backupBroken) { msg = "Longhand can’t keep its backup copy in this browser. Save to a file to be safe."; warn = true; }
-    else if (p.fileError) { msg = p.fileError; warn = true; }
-    else if (!p.handle) msg = canUseFiles ? `Kept in Longhand \u00b7 ${key("S")} saves it as a file` : "Kept in Longhand";
-    else if (p.needsPermission) msg = `Press ${key("S")} to keep saving to ${p.fileName}`;
-    else if (p.dirty) msg = "";
-    else msg = `Saved to ${p.fileName}`;
-    s.textContent = msg;
-    s.classList.toggle("warn", warn);
+    s.textContent = backupBroken
+      ? "This browser won’t let Longhand save. Use Export to keep a copy before you close it."
+      : "Saved on this computer";
+    s.classList.toggle("warn", backupBroken);
   }
 
   addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveNow(); });
   addEventListener("pagehide", () => { saveNow(); });
 
-  // ---------- opening files ----------
-  async function readHandle(handle) {
-    const file = await handle.getFile();
-    const buf = await file.arrayBuffer();
-    const isRTF = /\.rtf$/i.test(file.name);
-    let blocks, ours = true;
-    if (isRTF) {
-      const text = new TextDecoder("windows-1252").decode(buf);
-      ours = text.includes("\\generator Longhand");
-      blocks = RTF.fromRTF(text);
-    } else {
-      blocks = new TextDecoder().decode(buf).split(/\r?\n/).filter((l) => l.trim())
-        .map((l) => ({ tag: "p", runs: [{ text: l.trim(), b: false, i: false }] }));
-    }
-    return { file, isRTF, ours, html: docToHTML(blocks) || "<p><br></p>" };
-  }
-
-  async function openHandle(handle) {
-    await saveNow();
-    let got;
-    try { got = await readHandle(handle); }
-    catch (e) { toast("Longhand couldn’t read that file."); return; }
-    const { file, isRTF, ours, html } = got;
-
-    let p = null;
-    if (isRTF) {
-      for (const q of pieces) {
-        if (q.handle && await q.handle.isSameEntry(handle).catch(() => false)) { p = q; break; }
-      }
-    }
-    if (!p) { p = newPiece(html); pieces.push(p); }
-    else { adjustToday(-(p.words || 0)); p.html = html; p.updated = Date.now(); }
-    p.words = wordsIn(blockTexts(parse(html)).join(" "));
-    adjustToday(p.words);
-    if (isRTF) {
-      Object.assign(p, { handle, fileName: file.name, fileSavedAt: file.lastModified, dirty: false, fileError: null, needsPermission: false });
-    }
-    await keep(p);
-    load(p.id);
-    closeDrawer();
-    if (!isRTF) toast(`Opened ${file.name}. Saving will make a Rich Text copy and leave the original alone.`);
-    else if (!ours) toast(`Opened ${file.name}. Longhand keeps the words, italics, bold and headings. Other formatting is dropped when it saves.`);
-    else toast(`Opened ${file.name}.`);
-  }
-
-  async function openFile() {
-    if (!canUseFiles) { $("fileInput").click(); return; }
-    let handles;
-    try { handles = await window.showOpenFilePicker({ types: OPEN_TYPES, id: "longhand", multiple: false }); }
-    catch (e) { return; }
-    if (handles && handles[0]) openHandle(handles[0]);
-  }
-  $("fileInput").onchange = async () => {
-    const f = $("fileInput").files[0];
-    $("fileInput").value = "";
-    if (!f) return;
-    const fake = { getFile: async () => f };
-    try {
-      const { html } = await readHandle(fake);
-      await saveNow();
-      const p = newPiece(html);
-      pieces.push(p);
-      adjustToday(p.words);
-      await keep(p);
-      load(p.id);
-      toast(`Opened ${f.name}.`);
-    } catch (e) { toast("Longhand couldn’t read that file."); }
-  };
-
-  // If the file was changed in another app since Longhand last saved it, offer that version.
-  async function checkOutsideChanges(p) {
-    if (!p || !p.handle) return;
-    try {
-      if (await p.handle.queryPermission({ mode: "read" }) !== "granted") return;
-      const f = await p.handle.getFile();
-      if (f.lastModified > (p.fileSavedAt || 0) + 1000 && piece() === p) {
-        toast(`${p.fileName} was changed in another app.`, "Load that version", () => openHandle(p.handle));
-      }
-    } catch (e) {
-      if (e && e.name === "NotFoundError") { p.fileError = `${p.fileName} was moved or deleted. Use Save as to choose where to keep it.`; showStatus(); }
-    }
-  }
 
   // ---------- selection helpers ----------
   function blockOf(node) {
@@ -501,8 +323,12 @@
   addEventListener("keydown", (e) => {
     const mod = e.metaKey || e.ctrlKey;
     const k = e.key.toLowerCase();
-    if (mod && k === "s") { e.preventDefault(); e.shiftKey ? saveAs() : save(); }
-    else if (mod && k === "o") { e.preventDefault(); openFile(); }
+    if (mod && k === "s" && e.shiftKey) { e.preventDefault(); openExportMenu(); }
+    else if (mod && k === "s") {
+      e.preventDefault();
+      saveNow();
+      toast("Saved. Longhand saves as you type, on this computer. Use Export to keep a copy anywhere else.");
+    }
     else if (e.key === "Escape" && !$("drawer").hidden) closeDrawer();
   });
 
@@ -575,8 +401,8 @@
     $("today").textContent = added > 0 ? `+${fmt(added)} today` : added < 0 ? `${fmt(-added)} cut today` : "Nothing added yet today";
     const mins = Math.floor(sittingMs / 60000);
     $("sitting").textContent = mins >= 1 ? `${mins} min this sitting` : "";
-    const name = p.fileName ? stripExt(p.fileName) : (firstLine(toHTML(blocksOf(editor))) || "Untitled");
-    $("pieceTitle").textContent = p.fileName ? p.fileName : name;
+    const name = firstLine(toHTML(blocksOf(editor))) || "Untitled";
+    $("pieceTitle").textContent = name;
     document.title = `${name} — Longhand`;
   }
   setInterval(updateStats, 30000);
@@ -592,7 +418,6 @@
     updateStats();
     showStatus();
     window.scrollTo(0, 0);
-    checkOutsideChanges(p);
   }
 
   // ---------- prefs ----------
@@ -620,10 +445,7 @@
   $("spellBtn").onclick = () => toggle("spell");
   $("sizeDown").onclick = () => { prefs.size--; applyPrefs(); };
   $("sizeUp").onclick = () => { prefs.size++; applyPrefs(); };
-  $("openBtn").title = `Open a Rich Text file (${key("O")})`;
-  $("saveBtn").title = `Save as a Rich Text file (${key("S")})`;
-  $("saveAsBtn").title = `Save this piece to a new file (${key("S", true)})`;
-  $("openBtn").onclick = openFile;
+  $("exportBtn").title = `Save a copy as Word, PDF, Markdown or plain text (${key("S", true)})`;
 
   // ---------- export ----------
   const EXPORTS = {
@@ -632,8 +454,7 @@
     txt: { ext: ".txt", mime: "text/plain", desc: "Plain Text", make: (d) => LonghandExport.toText(d) },
   };
   function exportBaseName() {
-    const p = piece();
-    const name = p && p.fileName ? stripExt(p.fileName) : firstLine(toHTML(blocksOf(editor)));
+    const name = firstLine(toHTML(blocksOf(editor)));
     return (name || "Untitled").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60) || "Untitled";
   }
   async function exportAs(kind) {
@@ -692,8 +513,6 @@
   document.addEventListener("pointerdown", (e) => {
     if (!$("exportMenu").hidden && !e.target.closest(".export")) closeExportMenu();
   });
-  $("saveBtn").onclick = save;
-  $("saveAsBtn").onclick = () => { closeDrawer(); saveAs(); };
 
   // ---------- toast ----------
   let toastTimer = 0;
@@ -719,22 +538,14 @@
       const open = document.createElement("button");
       open.className = "piece-open";
       const t = document.createElement("span"); t.className = "t"; t.textContent = firstLine(p.html) || "Untitled";
-      const f = document.createElement("span"); f.className = p.fileName ? "f" : "f none"; f.textContent = p.fileName || "Not saved to a file yet";
       const m = document.createElement("span"); m.className = "m"; m.textContent = `${plural(p.words || 0, "word")} · edited ${ago(p.updated)}`;
-      open.append(t, f, m);
-      open.onclick = async () => {
+      open.append(t, m);
+      open.onclick = () => {
         saveNow();
         load(p.id);
         closeDrawer();
         editor.focus();
         placeCaret(editor.lastElementChild, true);
-        if (p.handle) {
-          try {
-            if (await p.handle.queryPermission({ mode: "readwrite" }) !== "granted") await p.handle.requestPermission({ mode: "readwrite" });
-            p.needsPermission = false;
-            showStatus();
-          } catch (e) { /* they can still press Save later */ }
-        }
       };
       const del = document.createElement("button");
       del.className = "piece-del";
@@ -781,8 +592,7 @@
     if (id === currentId) load([...pieces].sort((a, b) => b.updated - a.updated)[0].id);
     renderList();
     const name = titleOf(gone);
-    const msg = gone.fileName ? `Removed “${name}”. The file ${gone.fileName} is untouched.` : `Removed “${name}”.`;
-    toast(msg, "Undo", async () => {
+    toast(`Removed “${name}”.`, "Undo", async () => {
       pieces.splice(Math.min(idx, pieces.length), 0, gone);
       adjustToday(gone.words || 0);
       await keep(gone);
@@ -792,9 +602,22 @@
   }
 
   // ---------- start ----------
-  const ready = (async () => {
+  (async () => {
     try { pieces = await db.all(); } catch (e) { backupBroken = true; pieces = []; }
-    pieces.forEach((p) => { p.needsPermission = false; p.fileError = null; });
+    // Pieces from before Longhand stopped saving .rtf files may still carry file links. Drop them.
+    for (const p of pieces) {
+      if (!("handle" in p || "fileName" in p)) continue;
+      for (const f of ["handle", "fileName", "fileSavedAt", "dirty", "fileError", "needsPermission"]) delete p[f];
+      await keep(p);
+    }
+    // A Start here page from those days talks about .rtf files. Swap in the current one.
+    for (const p of pieces) {
+      if (firstLine(p.html) === "Start here" && p.html.includes("Rich Text file")) {
+        p.html = STARTER;
+        p.words = wordsIn(blockTexts(parse(STARTER)).join(" "));
+        await keep(p);
+      }
+    }
     // A Start here page made while the 826 National note was live still carries its line; take it out.
     for (const p of pieces) {
       if (firstLine(p.html) !== "Start here") continue;
@@ -812,14 +635,6 @@
     applyPrefs();
     load(currentId);
   })();
-
-  // Files opened from Finder or File Explorer ("Open with > Longhand") arrive here.
-  if ("launchQueue" in window) {
-    window.launchQueue.setConsumer(async (params) => {
-      await ready;
-      for (const h of params.files || []) if (h.kind === "file") await openHandle(h);
-    });
-  }
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     navigator.serviceWorker.register("sw.js").catch(() => { /* works online without it */ });
