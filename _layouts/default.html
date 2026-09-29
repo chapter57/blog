@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
-{%- assign description = page.description | default: site.description | strip_newlines | strip %}
+{%- assign description = page.dek | default: page.description | default: site.description | strip_newlines | strip %}
 <meta name="description" content="{{ description | escape }}">
 <meta property="og:site_name" content="{{ site.title }}">
 <meta property="og:title" content="{{ page.title | default: site.title | escape }}">
@@ -25,9 +25,9 @@
     <a class="wordmark" href="{{ '/' | relative_url }}">Longhand</a>
     <nav class="nav" aria-label="Main">
       <a href="{{ '/write/' | relative_url }}">Write</a>
-      <a href="{{ '/journal/' | relative_url }}"{% if page.url contains '/journal/' and page.url != '/journal/submit/' %} aria-current="page"{% endif %}>Journal</a>
-      <a href="{{ '/book-club/' | relative_url }}"{% if page.url contains '/book-club/' %} aria-current="page"{% endif %}>Book club</a>
-      <a href="{{ '/journal/submit/' | relative_url }}"{% if page.url == '/journal/submit/' %} aria-current="page"{% endif %}>Submit</a>
+      <a href="{{ '/#almanac' | relative_url }}"{% if page.collection == "almanac" %} aria-current="page"{% endif %}>Almanac</a>
+      <a href="{{ '/#essays' | relative_url }}"{% if page.collection == "essays" %} aria-current="page"{% endif %}>Essays</a>
+      <a href="{{ '/#contact' | relative_url }}">Write to us</a>
     </nav>
   </div>
 </header>
@@ -42,14 +42,9 @@
     <p>{{ site.description | strip }}</p>
     <ul class="colophon-links">
       <li><a href="{{ '/write/' | relative_url }}">The writing app</a></li>
-      <li><a href="{{ '/journal/' | relative_url }}">The journal</a></li>
-      <li><a href="{{ '/book-club/' | relative_url }}">The book club</a></li>
-      {%- if site.discussion_url != "" %}
-      <li><a href="{{ site.discussion_url }}">Join us on {{ site.discussion_name }}</a></li>
-      {%- endif %}
-      {%- if site.email != "" %}
+      <li><a href="{{ '/#almanac' | relative_url }}">The Almanac</a></li>
+      <li><a href="{{ '/#essays' | relative_url }}">Essays on craft</a></li>
       <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
-      {%- endif %}
     </ul>
     <p class="fine">Set in Literata and IBM Plex Mono. {{ site.season }}.</p>
   </div>

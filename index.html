@@ -6,17 +6,20 @@ layout: default
   // unless someone followed a link here on purpose.
   if ((matchMedia("(display-mode: standalone)").matches || navigator.standalone) && !document.referrer) location.replace("write/");
 </script>
-{%- assign issue = site.data.issues | last -%}
-{%- assign book = site.data.books | where: "status", "current" | first -%}
-{%- assign pieces = site.journal | where: "issue", issue.number -%}
+{%- assign issues = site.almanac | sort: "month" | reverse -%}
+{%- assign latest = issues | first -%}
+{%- assign essays = site.essays | sort: "published_on" | reverse -%}
 
 <section class="lead wrap">
-  <p class="kicker">{{ site.season }} · {{ issue.name }} {% if issue.status == "reading" %}open for submissions{% else %}out now{% endif %}</p>
-  <h1>A quiet place to write, read, and talk about both.</h1>
-  <p class="dek">Longhand is a free writing app, a small literary journal, and a book club. It's for people who care how a sentence sounds, and who'd like some company while they work on theirs.</p>
+  <div class="lead-copy">
+    <p class="kicker">{{ site.season }}{% if latest %} · Almanac No. {{ latest.number }} is out{% endif %}</p>
+    <h1>A quiet place to write, and a little company while you do.</h1>
+    <p class="dek">Longhand is a free writing app, a monthly almanac for writers, and an occasional essay on craft. It's for people who care how a sentence sounds.</p>
+  </div>
+  <div class="lead-art">{% include ill-pen.html %}</div>
 </section>
 
-<section class="dept dept-write wrap" aria-labelledby="write-h">
+<section class="dept dept-write wrap" id="write" aria-labelledby="write-h">
   <h2 class="label" id="write-h"><span>Write</span><span class="label-note">the app</span></h2>
   <div class="write-grid">
     <div class="write-copy">
@@ -29,7 +32,7 @@ layout: default
       </p>
     </div>
     <figure class="facsimile" aria-label="What writing in Longhand looks like">
-      <div class="fac-bar" aria-hidden="true"><span class="fac-mark">Longhand</span><span>Focus · Typewriter</span></div>
+      <div class="fac-bar" aria-hidden="true"><span class="fac-mark">Longhand</span><span>Focus · Typewriter · Export</span></div>
       <div class="fac-page" aria-hidden="true">
         <p class="fac-h">The Orchard</p>
         <p class="fac-dim">We went back in October, when the trees were already bare and the ground was soft with the ones nobody picked.</p>
@@ -40,65 +43,73 @@ layout: default
   </div>
 </section>
 
-<div class="split wrap">
-  <section class="dept" aria-labelledby="read-h">
-    <h2 class="label" id="read-h"><span>Read</span><span class="label-note">the journal</span></h2>
-    {%- if issue.status == "reading" %}
-    <p class="dept-title">{{ issue.name }} is open for submissions.</p>
-    <p>{{ issue.note }}</p>
-    <p class="meta">Deadline {{ issue.deadline | date: "%B %-d, %Y" }}</p>
-    <p class="actions"><a class="button" href="{{ '/journal/submit/' | relative_url }}">How to submit</a></p>
-    {%- else %}
-    <p class="dept-title">{{ issue.name }} is out now.</p>
+<div class="wrap">{% include ill-rule.html %}</div>
+
+<section class="dept wrap almanac" id="almanac" aria-labelledby="almanac-h">
+  <h2 class="label" id="almanac-h"><span>The Almanac</span><span class="label-note">once a month</span></h2>
+  {%- if latest %}
+  <p class="section-intro">Each month: a prompt to write toward, places currently reading submissions, and a short note on the work of writing.</p>
+  {%- assign latest_note = latest.content | markdownify %}
+  {% include almanac-issue.html issue=latest note=latest_note %}
+  {%- if issues.size > 1 %}
+  <div class="past">
+    <h3 class="label"><span>Past issues</span></h3>
     <ul class="toc">
-      {%- for p in pieces %}
-      <li><a href="{{ p.url | relative_url }}"><span class="toc-title">{{ p.title }}</span><span class="toc-author">{{ p.author }}</span></a></li>
+      {%- for i in issues offset: 1 %}
+      <li><a href="{{ i.url | relative_url }}"><span class="toc-title">{{ i.month | date: "%B %Y" }}</span><span class="toc-author">{{ i.prompt_title }}</span></a></li>
       {%- endfor %}
     </ul>
-    <p class="actions"><a class="text-link" href="{{ '/journal/' | relative_url }}">The whole journal</a></p>
-    {%- endif %}
-  </section>
+  </div>
+  {%- endif %}
+  {%- else %}
+  <p class="soon">The first Almanac arrives soon.</p>
+  {%- endif %}
+</section>
 
-  <section class="dept" aria-labelledby="talk-h">
-    <h2 class="label" id="talk-h"><span>Talk</span><span class="label-note">the book club</span></h2>
-    {%- if book %}
-    <p class="dept-title">Now reading <cite>{{ book.title }}</cite> by {{ book.author }}.</p>
-    <p>{{ book.blurb }}</p>
-    <ol class="weeks weeks-compact" data-weeks>
-      {%- for w in book.schedule %}
-      <li data-week-of="{{ w.week_of | date: '%Y-%m-%d' }}"><span class="week-date">{{ w.week_of | date: "%b %-d" }}</span><span>{{ w.reading }}</span></li>
-      {%- endfor %}
-    </ol>
-    <p class="actions"><a class="button" href="{{ '/book-club/' | relative_url }}">Read along</a></p>
-    {%- else %}
-    <p class="dept-title">We're choosing our next book.</p>
-    <p class="actions"><a class="button" href="{{ '/book-club/' | relative_url }}">About the book club</a></p>
-    {%- endif %}
-  </section>
-</div>
+<div class="wrap">{% include ill-rule.html %}</div>
 
-<section class="band" aria-labelledby="join-h">
+<section class="dept wrap essays" id="essays" aria-labelledby="essays-h">
+  <h2 class="label" id="essays-h"><span>Essays</span><span class="label-note">on craft, every so often</span></h2>
+  {%- if essays.size > 0 %}
+  <ul class="essay-list">
+    {%- for e in essays %}
+    <li>
+      <a href="{{ e.url | relative_url }}">
+        <span class="essay-title">{{ e.title }}</span>
+        {%- if e.dek %}<span class="essay-dek">{{ e.dek }}</span>{% endif %}
+        <span class="meta">{{ e.author }}{% if e.published_on %} · {{ e.published_on | date: "%B %Y" }}{% endif %}</span>
+      </a>
+    </li>
+    {%- endfor %}
+  </ul>
+  {%- else %}
+  <div class="essays-empty">
+    <p class="dept-title">The first essay is on its way.</p>
+    <p>Short, practical essays on the work of writing: beginnings, revision, dialogue, and finishing. They'll appear here every so often, and in the Almanac when they do.</p>
+    <p class="fine">Have a question about craft you'd like us to take on? Write to us at <a href="mailto:{{ site.email }}?subject=Essay%20idea">{{ site.email }}</a>.</p>
+  </div>
+  {%- endif %}
+</section>
+
+<section class="band" id="contact" aria-labelledby="contact-h">
   <div class="band-inner wrap">
+    <div class="band-art">{% include ill-envelope.html %}</div>
     <div>
-      <h2 class="band-title" id="join-h">Keep in touch.</h2>
-      <p>A short letter about once a month, and a place to talk between issues.</p>
-    </div>
-    <div class="band-actions">
-      {% include newsletter.html %}
-      {% include discussion.html %}
+      <h2 class="band-title" id="contact-h">Write to us.</h2>
+      <p>Answers to the prompt, open calls we should know about, ideas for an essay, or just hello. We read everything.</p>
+      <p class="band-email"><a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+      {%- if site.newsletter_username != "" %}
+      <form class="signup" action="https://buttondown.com/api/emails/embed-subscribe/{{ site.newsletter_username }}" method="post" target="_blank">
+        <label for="signup-email">Get the Almanac by email</label>
+        <div class="signup-row">
+          <input id="signup-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+          <button class="button" type="submit">Subscribe</button>
+        </div>
+        <p class="fine">Once a month. Unsubscribe any time.</p>
+      </form>
+      {%- else %}
+      <p class="fine">Want the Almanac by email? Write to us with "Almanac" in the subject, and we'll add you when the email edition starts.</p>
+      {%- endif %}
     </div>
   </div>
 </section>
-
-<script>
-  // Mark this week's reading in the book club schedule.
-  (function () {
-    var rows = document.querySelectorAll("[data-weeks] li");
-    var now = new Date();
-    for (var i = 0; i < rows.length; i++) {
-      var start = new Date(rows[i].getAttribute("data-week-of") + "T00:00:00");
-      var end = new Date(start.getTime() + 7 * 864e5);
-      if (now >= start && now < end) rows[i].classList.add("this-week");
-    }
-  })();
-</script>
