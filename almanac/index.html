@@ -1,0 +1,36 @@
+---
+layout: default
+title: The Almanac
+description: Prompts, notes on craft, and places to send your work, posted as they come.
+---
+{%- assign latest = site.posts | first -%}
+<section class="lead lead-almanac wrap">
+  <div class="lead-copy">
+    <p class="kicker">Read · the Almanac</p>
+    <h1>The Longhand Almanac</h1>
+    <p class="dek">Prompts to write toward, short notes on the work of writing, and places currently reading submissions. Posted as they come, a few times a month.</p>
+    <div class="moons-wrap">{% include ill-moons.html %}</div>
+  </div>
+  {%- if latest %}
+  <div class="lead-art lead-art-small">{% include ill-postmark.html month=latest.date %}</div>
+  {%- endif %}
+</section>
+
+<div class="wrap almanac-archive">
+  {%- if site.posts.size > 0 %}
+  {%- assign months = site.posts | group_by_exp: "p", "p.date | date: '%B %Y'" %}
+  {%- for m in months %}
+  <section class="archive-month" aria-labelledby="m-{{ forloop.index }}">
+    <h2 class="label" id="m-{{ forloop.index }}"><span>{{ m.name }}</span></h2>
+    <ul class="post-list">
+      {%- for p in m.items %}
+      {% include post-item.html post=p %}
+      {%- endfor %}
+    </ul>
+  </section>
+  {%- endfor %}
+  <p class="fine">Follow along in a feed reader: <a href="{{ '/almanac/feed.xml' | relative_url }}">longhandlit.com/almanac/feed.xml</a></p>
+  {%- else %}
+  <p class="soon">The first post arrives soon.</p>
+  {%- endif %}
+</div>

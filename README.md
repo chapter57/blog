@@ -1,35 +1,34 @@
 # Longhand
 
-A quiet place to write, and a little company while you do: a free writing app, a monthly almanac for writers, and an occasional essay on craft.
+A quiet place to write, and a little company while you do: a free writing app, an almanac for writers, and an occasional essay on craft.
 
 The site is built by GitHub Pages from this project. Changes go live a minute or two after they reach the `gh-pages` branch. Readers write to longhandlit@gmail.com (set as `email` in `_config.yml`).
 
+## Posting to the Almanac and adding essays (the easy way)
+
+The site is set up for **Pages CMS**, a free editor that works like a blog dashboard. Its settings are in `.pages.yml`.
+
+1. Go to [app.pagescms.org](https://app.pagescms.org) and sign in with GitHub.
+2. The first time, allow Pages CMS access to the `chapter57/longhand` project when GitHub asks, then open the project and choose the `gh-pages` branch.
+3. Choose **Almanac** or **Essays** in the sidebar, click **Add an entry**, and fill in the boxes:
+   - **Almanac:** Title, Date, Kind of post (Prompt, Note, Open calls or News), an optional Summary, and the post itself.
+   - **Essays:** Title, Description, Author, Date, and the essay itself.
+4. Click **Save**. The post is published to the site a minute or two later.
+
+The newest **Prompt** is featured on the front page with a "Write it in Longhand" button, and the four latest other posts are listed beside it. Every post also appears on the Almanac page (`/almanac/`), grouped by month, and in the feed at `/almanac/feed.xml`. Images added in the editor are stored in `assets/images/`.
+
 ## What's where
 
-- `index.html`: the front page, with the app, the current Almanac, the essays and "Write to us"
-- `_almanac/`: one file per Almanac issue, named by month (`2026-10.md`)
-- `_essays/`: one file per craft essay; `how-to-add-an-essay.md` is a template
+- `index.html`: the front page, with the app, the Almanac, the essays and "Write to us"
+- `_posts/`: Almanac posts, one file each, named by date and title
+- `almanac/index.html`: the Almanac page, listing every post by month
+- `_essays/`: one file per craft essay
 - `_layouts/`, `_includes/`, `assets/site.css`: the page design; the drawings (pen, moon phases, postmark, envelope, ink rule) are in `_includes/ill-*.html`
+- `.pages.yml`: the Pages CMS editing screens
 - `_config.yml`: site settings
 - `fonts/`: Literata and IBM Plex Mono, both under the SIL Open Font License (see `fonts/OFL.txt`)
 - `write/`: the Longhand writing app
 - `sw.js`: retires the offline copy that older installs of the app kept at the site's main address
-
-## A new Almanac issue
-
-1. Copy last month's file in `_almanac/` and name the copy by the new month, like `2026-11.md`.
-2. Change `number`, `month`, the prompt lines, and the open calls. Each open call has a `name`, `what`, `deadline` and `url`; leave `open_calls: []` for a month without any.
-3. Replace the note under the second `---` line with this month's note from the editor.
-
-The front page always shows the newest issue in full and lists the older ones. Each issue also has its own page at `longhandlit.com/almanac/2026-11/`.
-
-## A new essay
-
-1. Copy `_essays/how-to-add-an-essay.md` to a new file with a short name, like `_essays/on-revision.md`.
-2. Fill in the title, one-sentence description (`dek`), author and date, and paste the essay underneath.
-3. Delete the `published: false` line.
-
-It appears in the Essays section of the front page, newest first, with its own page at `longhandlit.com/essays/on-revision/`.
 
 ## The Almanac by email
 
