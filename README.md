@@ -55,21 +55,19 @@ DNS records for the website (the forum at `forum.longhandlit.com` is on Namechea
 | A | @ | 185.199.111.153 |
 | CNAME | www | chapter57.github.io |
 
-The writing app's backup copies are kept per address, so anyone who used the app at an earlier address should save their pieces as files (⌘S / Ctrl+S) there, then reinstall from longhandlit.com/write/ and open them.
+The writing app keeps pieces per address, so anyone who used it at an earlier address should Export their pieces there, then reinstall from longhandlit.com/write/ and paste them in.
 
 ## The writing app
 
-Longhand runs in Chrome or Microsoft Edge on a Mac or Windows PC, works without the internet once installed, and saves writing as Rich Text (`.rtf`) files that open in Word, Pages, TextEdit, LibreOffice and Scrivener.
+Longhand runs in Chrome or Microsoft Edge on a Mac or Windows PC and works without the internet once installed. Every piece is saved as you type in the browser's own storage (IndexedDB) on that computer, and nothing is ever sent to a server. **Export** is the only way writing leaves the app: Word (.docx), PDF (through the print window's "Save as PDF"), Markdown (.md) or plain text (.txt).
 
 To install it, open `…/write/` in Chrome and click the install icon at the right end of the address bar. In Edge, open the **⋯** menu and choose **Apps → Install this site as an app**.
 
 Keys (on Windows, use Ctrl where these say ⌘, and Shift for ⇧):
 
-- ⌘S saves to a Rich Text file. After the first save, Longhand keeps the file up to date as you write.
-- ⇧⌘S saves a copy under a new name.
-- ⌘O opens an `.rtf` or `.txt` file.
-- **Export** saves a copy as Word (.docx), PDF (through the print window's "Save as PDF"), Markdown (.md) or plain text (.txt).
+- ⌘S confirms the piece is saved. Longhand saves on its own as you type.
+- ⇧⌘S opens the Export menu.
 - ⌘I and ⌘B for italics and bold. Type `#` and a space at the start of a line for a heading.
 - Esc brings the buttons back while you're writing.
 
-The app's files are in `write/`: `index.html` (page and styling), `app.js` (editor, saving, opening files), `rtf.js` (reads and writes Rich Text Format), `export.js` (Word, Markdown and plain-text exports), `sw.js` (offline support; bump `VERSION` there whenever an app file changes), and `manifest.webmanifest` with `icons/` (what Chrome needs to install it).
+The app's files are in `write/`: `index.html` (page and styling), `app.js` (editor and saving), `export.js` (Word, Markdown and plain-text exports), `sw.js` (offline support; bump `VERSION` there whenever an app file changes), and `manifest.webmanifest` with `icons/` (what Chrome needs to install it).

@@ -3,12 +3,11 @@
 // Caches are shared across the whole site, so this one only ever touches
 // caches named "longhand-write-…" (plus the old "longhand-N" ones from before
 // the app moved into /write/).
-const VERSION = "longhand-write-7";
+const VERSION = "longhand-write-8";
 const FILES = [
   "./",
   "index.html",
   "app.js",
-  "rtf.js",
   "export.js",
   "manifest.webmanifest",
   "icons/icon.svg",
